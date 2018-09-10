@@ -1,0 +1,473 @@
+#include <stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<windows.h>
+
+#define YITIAO_MAJIANG      1                                     
+#define ERTIAO_MAJIANG      2                                        
+#define SANTIAO_MAJIANG     3                                          
+#define SITIAO_MAJIANG      4                                          
+#define WUTIAO_MAJIANG      5                                          
+#define LIUTIAO_MAJIANG     6                                         
+#define QITIAO_MAJIANG      7                                          
+#define BATIAO_MAJIANG      8                                         
+#define JIUTIAO_MAJIANG     9   
+
+#define YIWAN_MAJIANG       11                                    
+#define ERWAN_MAJIANG       12                                       
+#define SANWAN_MAJIANG      13                                          
+#define SIWAN_MAJIANG       14                                         
+#define WUWAN_MAJIANG       15                                        
+#define LIUWAN_MAJIANG      16                                          
+#define QIWAN_MAJIANG       17                                          
+#define BAWAN_MAJIANG       18                                          
+#define JIUWAN_MAJIANG      19 
+
+#define YITONG_MAJIANG      21                                         
+#define ERTONG_MAJIANG      22                                         
+#define SANTONG_MAJIANG     23                                         
+#define SITONG_MAJIANG      24                                          
+#define WUTONG_MAJIANG      25                                          
+#define LIUTONG_MAJIANG     26                                          
+#define QITONG_MAJIANG      27                                          
+#define BATONG_MAJIANG      28                                          
+#define JIUTONG_MAJIANG     29
+
+#define DONGFENG_MAJIANG    31                                           
+#define NANFENG_MAJIANG     32                                           
+#define XIFENG_MAJIANG      33                                          
+#define BEIFENG_MAJIANG     34                                           
+#define HONGZHONG_MAJIANG   35                                           
+#define FACAI_MAJIANG       36                                           
+#define BAIBAN_MAJIANG      37 
+
+
+
+#define NOTYPE_MAJIANG			0	//	牌型不成立
+#define HAVETYPE_MAJIANG		1	//  牌型成立
+#define NULL_MAJIANG			10	//	空麻将
+#define AA_MAJIANG              2   //	判断将（不一定是2，5，8将）  
+#define AAA_MAJIANG             3   //	判断三刻                                                             
+#define ABC_MAJIANG             1   //	判断三顺                                                             
+#define MAX_HAND_CARD_MAJIANG   14  //	手上的牌，最多时候的张数 
+
+
+//int Hu(int PAI[38]);
+//int h258jiang(int PAI[14]);						//判断胡牌
+int PPHU(int PPH[14]);						//判断碰碰胡
+int Remain(int PAI[14]);					//判断手牌剩余的牌
+int QiDui(int QiDui_PAI[14]);				//判断七对
+int Hu(int PAI[14]);
+int HHQD(int HHQD[14]);						//判断豪华七对
+int shisanyao(int shisan[14]);
+void mysort(int *aa, int l);				//将输入的手牌进行排序
+int isJiangPai(int pai);					//存放将牌
+int aPAI[38];								//保存牌型的数组
+int DiJ = 0;								//底金
+int QiDui_Jiang = 0;						//判断七对将 是否是七对
+
+int main()
+{
+
+	int pai[14] = { 0, };
+	int i = 0;
+	int sum = 0;	//总的分这里默认为三家
+	int num = 0;	//应该所得到得分数
+	printf("请选择底金:");
+	scanf("%d",&DiJ);
+	printf("本局底金为:%d\n", DiJ);
+
+	
+	/*************************************在此判断牌得张数*************************************/
+	printf("------温馨提示：数字0,10,20,30为系统预留空间------\n");
+	for (i = 0; i < 14; i++)
+	{
+		//依次输入手牌
+		printf("please you majon ipt:");
+		scanf("%d", &pai[i]);
+		printf("rand = %d\n", pai[i]);
+
+		
+		if ((pai[i] == 0) || (pai[i] == 10) || (pai[i] == 20) || (pai[i] == 30) || (pai[i] > 37))	//在判断牌型时 根据宏定义的数据来进行判断 方便来做判断
+		{
+			printf("input majon_type is error....quit\n");
+			return 0;
+		}
+	}
+	mysort(pai, 14);
+
+	
+	for (i = 0; i < 14; i++)	//循环遍历输入的牌型 判断牌型是否成立若输入的手牌牌型大于4 则超出了麻将的牌数故直接退出
+	{
+
+		printf("%3d", pai[i]);
+		aPAI[pai[i]]++;
+		if (aPAI[pai[i]] > 4)
+		{
+			printf("\n");
+			printf("you input pai %d greater than 4.....so...bai\n", pai[i]);
+			return 0;
+
+		}
+
+	}
+	
+
+
+	/*
+	if (h258jiang(pai))
+	{
+		printf("\n");
+		printf("win................258");
+		system("pause");
+		return 0;
+	}
+	else
+	{
+		printf("\n");
+		printf("No Win\n");
+		system("pause");
+	}
+	*/
+	//豪华七对
+	if (HHQD(pai))
+	{
+		printf("\n");
+		printf("HHQD......\n");
+		//胡牌算分
+		Sleep(1000);
+		num = DiJ * 15;
+		sum = num * 3;
+		printf("应得分:%d\n", num);
+		Sleep(1000);
+		printf("总得分:%d\n", sum);
+		system("pause");
+		return 0;
+	}
+	//七对
+	if (QiDui(pai))
+	{
+
+		printf("\n");
+		printf("QiDui...\n");
+		//胡牌算分
+		num = DiJ * 8;
+		sum = num * 3;
+		printf("应得分:%d\n", num);
+		Sleep(1000);
+		printf("总得分:%d\n", sum);
+		system("pause");
+		return 0;
+
+	}
+	//碰碰胡
+	if (PPHU(pai))
+	{
+		printf("\n");
+		printf("PPHU......\n");
+		//胡牌算分
+		num = DiJ * 12;
+		sum = num * 3;
+		printf("应得分:%d\n", num);
+		Sleep(1000);
+		printf("总得分:%d\n", sum);
+		system("pause");
+		return 0;
+	}
+	
+	if (shisanyao(pai))
+	{
+		printf("\n");
+		printf("十三幺\n");
+		//胡牌算分
+		num = DiJ * 13;
+		sum = num * 3;
+		printf("应得分:%d\n", num);
+		Sleep(1000);
+		printf("总得分:%d\n", sum);
+		system("pause");
+		return 0;
+	}
+
+	//平胡
+	////////////////////////////////////////////////////////////////////////////
+	if (Hu(pai))
+	{
+		printf("\n");
+		printf("Win 2333\n");
+		//胡牌算分
+		num = DiJ * 2;
+		sum = num * 3;
+		printf("应得分:%d\n", num);
+		Sleep(1000);
+		printf("总得分:%d\n", sum);
+		system("pause");
+		return 0;
+	}
+	else
+	{
+		printf("\n");
+		printf("No Win\n");
+		system("pause");
+	}
+	return 0;
+}
+//判断七对
+int QiDui(int QiDui_Jiag[14])
+{
+	int i = 0;
+	memset(aPAI, 0, sizeof(aPAI));
+	for (i = 0; i < 14; i++)
+	{
+		//循环遍历手牌，将牌型各自+1
+		aPAI[QiDui_Jiag[i]]++;
+		printf("qidui[%d] = %d ---%d\n", i, QiDui_Jiag[i], aPAI[QiDui_Jiag[i]]);
+
+
+		//判断牌型是否为将
+		if (aPAI[QiDui_Jiag[i]] == 2)
+		{
+			aPAI[QiDui_Jiag[i]] -= 2;
+			QiDui_Jiang++;
+
+
+		}
+		//判断牌型是否为4个 如为四个一样的牌型则QiDui_JIang+2;
+		if (aPAI[QiDui_Jiag[i]] == 4 && aPAI[QiDui_Jiag[i]] > 3)	QiDui_Jiang += 2;
+
+	}
+	printf("QiDui_Jiang =%d\n", QiDui_Jiang);
+	if (QiDui_Jiang == 7)	return 1;
+	return 0;
+}
+
+int   Hu(int   PAI[14])
+{	
+	static   int   JIANG = 0;									//   将牌标志，即牌型“三三三三二”中的“二”    
+	int i;	  
+	if (!Remain(PAI))   return   1;								//   递归退出条件：如果没有剩牌，则和牌返回。    
+
+	for (i = 0; !aPAI[PAI[i]] && i<14; i++);					//   找到有牌的地方，i就是当前牌,   aPAI[PAI[i]]是个数    
+
+	printf("i   =   %d\n", i);								    //   跟踪信息    
+	
+																//   4张组合(杠子)    
+	if (aPAI[PAI[i]] == 4)									    //   如果当前牌数等于4张    
+	{
+		aPAI[PAI[i] ] = 0;										 //  除开全部4张牌    
+		if (Hu(PAI))   return   1;								//   如果剩余的牌组合成功，和牌    
+		aPAI[PAI[i]] = 4;										//   否则，取消4张组合    
+	}
+
+	//   3张组合(大对)    
+	if (aPAI[PAI[i]] >= 3)										//   如果当前牌不少于3张    
+	{
+		aPAI[PAI[i]] -= 3;								      //   减去3张牌    
+		if (Hu(PAI))   return   1;							  //   如果剩余的牌组合成功，和牌    
+		aPAI[PAI[i]] += 3;                                   //   取消3张组合    
+	}
+
+	//   2张组合(将牌)    
+	if (!JIANG   &&   aPAI[PAI[i]] >= 2)					//   如果之前没有将牌，且当前牌不少于2张    
+	{
+		JIANG = 1;											 //   设置将牌标志    
+		aPAI[PAI[i]] -= 2;                                   //   减去2张牌    
+		if (Hu(PAI))   return   1;							 //   如果剩余的牌组合成功，和牌    
+		aPAI[PAI[i]] += 2;                                   //   取消2张组合    
+		JIANG = 0;											//   清除将牌标志    
+	}
+
+
+	if (PAI[i]   >   JIUTONG_MAJIANG)         return   0;				  //   “东南西北中发白”没有顺牌组合，不和    
+
+																			//   顺牌组合，注意是从前往后组合！    
+	if (PAI[i] % 10 != 8 && PAI[i] % 10 != 9 &&								 //   排除数值为8和9的牌    
+		aPAI[PAI[i]+1] && aPAI[PAI[i]+2])									  //   如果后面有连续两张牌    
+	{
+		aPAI[PAI[i]]--;
+		PAI[PAI[i]+ 1 ]--;
+		aPAI[PAI[i]+ 2 ]--;													    //   各牌数减1    
+		if (Hu(PAI))   return   1;												//   如果剩余的牌组合成功，和牌    
+		PAI[i]++;
+		PAI[PAI[i] + 1]++;
+		aPAI[PAI[i] + 2]++;														 //   恢复各牌数    
+	}
+
+	//   无法全部组合，不和！    
+	return   0;
+}
+
+//   检查剩余牌数    
+int   Remain(int   PAI[14])
+{
+	int   sum = 0;
+	
+	for (int i = 0; i<14; i++)
+		sum += aPAI[PAI[i]];
+	return   sum;
+}
+
+//豪华七对
+int HHQD(int HHQD[14])
+{
+	int i = 0;
+	int HH_QD = 0;
+	int jiang = 0;
+	//由于aPAI[38]为全局变量，则每次都需要把该数组内所有数据初始化为0；
+	memset(aPAI, 0, sizeof(aPAI));
+	for (i = 0; i < 14; i++)
+	{	//循环遍历手牌，将牌型各自+1；
+		aPAI[HHQD[i]]++;
+		//当该牌型为4 则+1
+		if (aPAI[HHQD[i]] == 4)
+		{
+			HH_QD++;
+		}
+		//判断该牌型是否有将
+		if (!jiang && aPAI[HHQD[i]] == 2)
+		{
+			jiang++;
+		}
+	}
+	if (HH_QD == 3 && jiang == 1)	return 1;
+	return 0;
+}
+
+//PPH
+int PPHU(int PPH[14])
+{
+	int i = 0;
+	int PP_H = 0;
+	int jiang = 0;
+	//由于aPAI[38]为全局变量，则每次都需要把该数组内所有数据初始化为0；
+	memset(aPAI, 0, sizeof(aPAI));
+	for (i = 0; i<14; i++)
+	{
+		//循环遍历手牌，将牌型各自+1
+		aPAI[PPH[i]]++;
+		//当该牌型为2 则+1
+		if (aPAI[PPH[i]] == 3)
+		{
+			aPAI[PPH[i]] -= 3;
+			PP_H++;
+		}
+		//判断该牌型是否有将
+		if (!jiang && aPAI[PPH[i]] == 2)
+		{
+			jiang++;
+		}
+	}
+	//在这里判断该手牌是否有十四张牌....r如果没有则直接退出
+
+	printf("PPH = %d,jiang = %d\n", PP_H, jiang);
+	if (PP_H == 4 && jiang == 1)	return 1;
+
+	return 0;
+}
+
+//十三幺
+int shisanyao(int shisan[14])
+{
+	int i = 0;
+	int majon = 0;
+	int jiang = 0;
+	memset(aPAI,0,sizeof(aPAI));
+	
+	for (i = 0; i < 14; i++)
+	{
+		aPAI[shisan[i]]++;
+		//用条件语句来限制牌型
+		if ((shisan[i] == YITIAO_MAJIANG) || (shisan[i] == JIUTIAO_MAJIANG) || (shisan[i] == YIWAN_MAJIANG) || \
+			(shisan[i] == JIUWAN_MAJIANG)||(shisan[i] == YITONG_MAJIANG) || (shisan[i] == JIUTONG_MAJIANG) || (shisan[i]) > JIUTONG_MAJIANG)
+		{		
+			if (aPAI[shisan[i]] == 1)
+			{
+				
+				continue;
+			}
+		}
+		else if (aPAI[shisan[i]] == 2)
+		{
+			jiang++;	
+		}
+		else
+		{
+			return 0;
+		}
+		//在这里判断该手牌是否有十四张牌....r如果没有则直接退出
+		if (jiang != 1)	return 0;
+		printf("%d", jiang);
+	}
+	return 1;
+}
+
+
+//将258将牌单独用一个函数来存放
+int isJiangPai(int pai)
+{
+
+	//将258将牌单独用一个函数来存放 如果该牌型里是否有258将
+	if (pai == ERTIAO_MAJIANG) return 1;
+	if (pai == WUTIAO_MAJIANG) return 1;
+	if (pai == BATIAO_MAJIANG) return 1;
+
+	if (pai == ERTONG_MAJIANG) return 1;
+	if (pai == WUTONG_MAJIANG) return 1;
+	if (pai == BATONG_MAJIANG) return 1;
+
+	if (pai == ERWAN_MAJIANG) return 1;
+	if (pai == WUWAN_MAJIANG) return 1;
+	if (pai == BAWAN_MAJIANG) return 1;
+
+	return 0;
+}
+//对输入的手牌进行排序(顺序)
+void mysort(int * aa, int l)
+{
+	int tmp;
+	int i = 0;
+	int j = 0;
+	for (i = 0; i<l; i++)
+	{
+		for (j = i + 1; j<l; j++)
+		{
+			if (aa[i] > aa[j])
+			{
+				tmp = aa[j];
+				aa[j] = aa[i];
+				aa[i] = tmp;
+			}
+		}
+	}
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int PAI_Type(int PAI[38])	//PAI[38]1-9表示tiao 11-19表示万.........
+{
+	int begin = YITIAO_MAJIANG;
+	int end = BAIBAN_MAJIANG;	//表示麻将最后一张
+	int len = 0;	//表示麻将的长度
+	int i = 0;
+	int i_pai[38];
+	memset(i_pai,0,sizeof(i_pai));
+	memcpy(i_pai,PAI,sizeof(int)* 38);
+
+	//遍历牌型
+	for (i = YITIAO_MAJIANG; i < 38; i++)	
+	{
+		while (i > JIUTONG_MAJIANG)
+		{
+			if (PAI[i] < 2)	return 0;					//由于在有风的情况下如果不为刻字和将则不能胡牌直接返回0;
+			continue;
+		}
+		if (PAI[i] == 2)
+		{
+			PAI[i] -= 2;
+		}
+		
+		//if (PAI[DONGFENG_MAJIANG] < 2)	return 0;	//由于在有风的情况下如果不为刻字和将则不能胡牌直接返回0;
+
+
+	}
+}
